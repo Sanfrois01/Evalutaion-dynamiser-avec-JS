@@ -1,0 +1,19 @@
+@font-face {
+  font-family: "Lato";
+  src: url(Lato/Lato-Light.ttf) format("truetype");
+}
+
+#player1, #player2{
+  font-size: 3em;
+} 
+
+#global-points-player1 , #global-points-player2{
+  font-size: 5em;
+}
+
+#current-points-player1,#current-points-player2{
+  font-size: 2em;
+  background-color: lightcoral;
+  color: white;
+  
+}
