@@ -1,90 +1,166 @@
 // Récupétation des ID
-const newGame = document.getElementById('new-game');
-const dice = document.getElementById('dice');
+const customModalEvent = new Event("custom-modal-event")
 
-const globalPointsP1 = document.getElementById('grobal-points-player1')
-const globalPointsP2 = document.getElementById('grobal-points-player2')
+let player1 = document.getElementById('player1');
+let player2 = document.getElementById('player2');
+let activePlayer1 = document.getElementById('active-player1')
+let activePlayer2 = document.getElementById('active-player2')
+let winner = document.getElementById('winner')
 
-const currentPointsP1 = document.getElementById('current-points-player1')
-const currentPointsP2 = document.getElementById('current-points-player2')
 
-const rollDice = document.getElementById('roll-dice')
-const hold = document.getElementById('hold')
 
-//Creation de nouvelle partie et condition de victoire
+let globalPointsP1 = document.getElementById('global-points-player1');
+let globalPointsP2 = document.getElementById('global-points-player2');
 
-class nouvellePartie {
-  constructor(turn,players){
-    this.turn = turn
-    this.players = players
-    this.winner = null
-  }
+let currentPointsP1 = document.getElementById('current-points-player1');
+let currentPointsP2 = document.getElementById('current-points-player2');
 
-  winner(){
-    let globalPoint = 0;
-    this.players.forEach(player => {
-    this.winner = player.globalPoint === 100 ? player : this.winner
-  })
-}
-}
+//Buttons
+let btnRollDice = document.getElementById('roll-dice');
+let btnHold = document.getElementById('hold');
+let btnNewGame = document.getElementById('new-game');
 
-class Player {
-  constructor(name,globalPoint,currentPoints,turn){
-    this.name = name
-    this.globalPoint = 0
-    this.currentPoints = 0
-    this.turn = null
-  }
+let currentScore;
+let currentPlayer;
+let globalScore1;
+let globalScore2;
+
+
+//Creation de nouvelle partie 
+
+function init() {
+
+  currentPlayer = true;
+  activePlayer()
+  // Tous les score a 0
+
+  currentScore = globalScore1 = globalScore2 = 0;
 
   
 
-  roll(){      
-    if (this.turn = true){
-      this.currentPoints += this.rand(1,6)
+  // affichage des score a 0
+  
+  currentPointsP1.textContent = "0";
+  currentPointsP2.textContent = "0";
+  globalPointsP1.textContent = "0";
+  globalPointsP2.textContent = "0";
+
+  //Listener et stop du bouillonnement
+  
+  btnNewGame.addEventListener('click',resetNewGame,true);
+  btnRollDice.addEventListener('click',rollDice,true);
+  btnHold.addEventListener('click',holdingPoint,true);
+  
+
+  
+
+
+}
+
+// Roulement de dés avec affichage des images
+
+  function rollDice(){
+    let scoreDice = Math.floor(Math.random()*Math.floor(6))+1;
+    switch (scoreDice){
+      case 1:
+      document.getElementById('dice').src='img/dice-1.svg'; 
+      break;
+      case 2:
+      document.getElementById('dice').src='img/dice-2.svg';
+      break;
+      case 3:
+      document.getElementById('dice').src='img/dice-3.svg';
+      break;
+      case 4:
+      document.getElementById('dice').src='img/dice-4.svg';
+      break;
+      case 5:
+      document.getElementById('dice').src='img/dice-5.svg';
+      break;
+      case 6:
+      document.getElementById('dice').src='img/dice-6.svg';
+      break;
     }
+
+      if(scoreDice !=1) {
+        currentScore += scoreDice      
+        currentPlayer === true ? currentPointsP1.textContent = currentScore : currentPointsP2.textContent = currentScore
+      }else{
+        nextPlayer()
+        
+      }
+    }
+
+  //Transfert des points au joueur du Current au Global
+
+  function holdingPoint(){
+    if (currentPlayer === true){
+      globalScore1 += currentScore
+      globalPointsP1.textContent = globalScore1
+  } else {
+      globalScore2 += currentScore
+      globalPointsP2.textContent = globalScore2
+  }
+    
+    nextPlayer()
+    checkScore()
+  
   }
   
-}
 
-// Déclaration des Listener
+//Condition de Victoire
 
-newGame.addEventListener('click', () =>{
-  let player1 = new Player ('Player 1',0,0,true)
-  let player2 = new Player ('Player 2',0,0,false)
-})
+function checkScore(){
 
-rollDice.addEventListener('click',()=>{
-  let score = rand(1,6)
-  switch (score){
-    case 1:
-    document.getElementById('dice').src='img/dice-1.svg';
-    break;
-    case 2:
-    document.getElementById('dice').src='img/dice-2.svg';
-    break;
-    case 3:
-    document.getElementById('dice').src='img/dice-3.svg';
-    break;
-    case 4:
-    document.getElementById('dice').src='img/dice-4.svg';
-    break;
-    case 5:
-    document.getElementById('dice').src='img/dice-5.svg';
-    break;
-    case 6:
-    document.getElementById('dice').src='img/dice-6.svg';
-    break;
-}
+  if(globalScore1 >= 100){
+    winner.textContent = 'Player 1 Won'
+    showModal()
+    init()
+    }
+
+  if(globalScore2 >= 100){
+    winner.textContent ='Player 2 Won'
+    showModal()
+    init()
 
   }
-)
-
-//Déclaration de Fonctions
-
-function rand(min,max){
-  return Math.floor(Math.random()*(max-min+1)+min);
 }
 
+// Reset du Jeu
+function resetNewGame(){
+  let beganNewGame = document.getElementById('modal-newgame')
+  $('#modal-newgame').modal('show')
+    init()
+}
 
+//Joueur actif
+function activePlayer() {
+  if (currentPlayer === true){
+  activePlayer1.style.display = 'inline';
+  activePlayer2.style.display = 'none';
+  }
+  if (currentPlayer === false){
+  activePlayer2.style.display = 'inline';
+  activePlayer1.style.display = 'none';
+  }
+}
 
+//Prochain joueur
+function nextPlayer(){
+  currentScore = 0
+  // currentScore à 0 en HTML
+  currentPointsP1.textContent = '0'
+  currentPointsP2.textContent = '0'
+  // changer le currentPlayer
+  currentPlayer === true ? currentPlayer = false : currentPlayer = true
 
+  activePlayer()
+}
+
+//afficher modal de victoire
+function showModal(){
+  let modalWinner = document.getElementById('modal-winner')
+  $('#modal-winner').modal('show')
+}
+
+init()
